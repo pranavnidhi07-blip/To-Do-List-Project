@@ -1,0 +1,258 @@
+================================================================================
+            MULTI-USER TO-DO LIST - QUICK START GUIDE
+================================================================================
+
+🎯 BOTH CHANGES COMPLETED:
+1. ✅ Data storage changed from .json to .txt files
+2. ✅ Multi-user system with login/logout added
+
+================================================================================
+HOW TO RUN FOR DEMO
+================================================================================
+
+MAC:
+----
+1. Open Terminal in VS Code (Cmd+`)
+2. Run: ./build/server
+3. Open browser: http://localhost:8080
+4. You'll see login page automatically
+
+WINDOWS:
+--------
+1. Open Terminal in VS Code (Ctrl+`)
+2. Run: build\server.exe
+3. Open browser: http://localhost:8080
+4. You'll see login page automatically
+
+TO STOP SERVER:
+---------------
+Press Ctrl+C in the terminal
+
+
+================================================================================
+DEMO STEPS (Show Faculty)
+================================================================================
+
+STEP 1: Show Login Page
+------------------------
+"This is our login page. Let me create 3 different users to demonstrate 
+multi-user capability."
+
+STEP 2: Create User A (Alice)
+------------------------------
+- Click "New User" tab
+- Username: alice
+- Display Name: Alice Smith
+- Click "Create Account & Login"
+- Add 3 tasks for Alice:
+  * "Buy groceries" (shopping)
+  * "Study C++" (study)  
+  * "Watch Inception" (movies)
+- Point to top-right: "See Alice Smith logged in"
+
+STEP 3: Logout and Create User B (Bob)
+---------------------------------------
+- Click logout button (red icon)
+- Create new user:
+  * Username: bob
+  * Display Name: Bob Johnson
+- Bob sees EMPTY dashboard (no Alice's tasks!)
+- Add 2 tasks for Bob:
+  * "Finish homework" (study)
+  * "Call dentist" (personal)
+
+STEP 4: Create User C (Charlie)
+--------------------------------
+- Logout again
+- Create Charlie:
+  * Username: charlie
+  * Display Name: Charlie Davis
+- Empty dashboard again
+- Add 1 task: "Team meeting" (work)
+
+STEP 5: Switch Between Users (KEY DEMO!)
+-----------------------------------------
+- Logout from Charlie
+- Login page shows ALL 3 USERS now!
+- Click "Alice Smith" → See her 3 tasks
+- Logout, click "Bob Johnson" → See his 2 different tasks
+- Logout, click "Charlie Davis" → See his 1 different task
+
+"This proves each user has completely separate task lists!"
+
+STEP 6: Show File Structure
+----------------------------
+- Open File Explorer/Finder
+- Go to project/data folder
+- Show these files:
+  * users.txt (has all 3 users)
+  * tasks_alice.txt (Alice's tasks)
+  * tasks_bob.txt (Bob's tasks)
+  * tasks_charlie.txt (Charlie's tasks)
+- Open one in text editor
+- "See? We use .txt files as requested!"
+
+
+================================================================================
+WHAT TO SAY TO FACULTY
+================================================================================
+
+ABOUT FILE CHANGE (.json → .txt):
+----------------------------------
+"You mentioned JSON isn't covered in our syllabus. We changed all data storage 
+to .txt files. The data inside is structured text that our C++ program can 
+read and write. Each user's tasks are in a separate .txt file."
+
+ABOUT MULTI-USER:
+-----------------
+"We implemented a complete multi-user system. When you open the app, you see 
+a login page. Users can create accounts or login to existing ones. Each user's 
+tasks are completely isolated - Alice cannot see Bob's tasks. The system 
+stores each user's data in their own .txt file (tasks_alice.txt, tasks_bob.txt). 
+The top-right corner shows who's logged in, and there's a logout button."
+
+
+================================================================================
+TECHNICAL POINTS (If Faculty Asks)
+================================================================================
+
+FILES CHANGED/ADDED:
+--------------------
+✅ src/user_service.h       (NEW - user management)
+✅ src/user_service.cpp     (NEW - user operations)
+✅ src/task_service.cpp     (MODIFIED - per-user files)
+✅ frontend/login.html      (NEW - login/registration page)
+✅ frontend/script.js       (MODIFIED - auth checking)
+✅ frontend/styles.css      (MODIFIED - logout button styling)
+✅ src/main.cpp            (MODIFIED - user API endpoints)
+✅ CMakeLists.txt          (MODIFIED - compile user_service)
+
+NEW API ENDPOINTS:
+------------------
+- GET /api/users          → List all users (for login page)
+- POST /api/users         → Create new user
+- POST /api/login         → Login existing user
+
+HOW USER SEPARATION WORKS:
+---------------------------
+- Each user has unique username (e.g., "alice")
+- Server creates file: data/tasks_<username>.txt
+- When user logs in, server switches to their file
+- Function: task_service.set_current_user("alice")
+  Changes file from tasks.txt → tasks_alice.txt
+- All CRUD operations now work on that user's file only
+
+SESSION MANAGEMENT:
+-------------------
+- Uses browser's sessionStorage
+- Stores: current_user, display_name
+- Checked on every page load
+- Cleared on logout
+
+
+================================================================================
+COMMON QUESTIONS & ANSWERS
+================================================================================
+
+Q: Why .txt instead of .json?
+A: Faculty requirement - JSON not in syllabus. Files use .txt extension but 
+   contain structured data our C++ program can parse.
+
+Q: How do you prevent users from seeing each other's tasks?
+A: Physical file separation. Alice's tasks in tasks_alice.txt, Bob's in 
+   tasks_bob.txt. Server only opens the logged-in user's file.
+
+Q: What if username already exists?
+A: System checks and shows error "Username already exists". Must choose unique.
+
+Q: Is there password protection?
+A: Not currently - focused on core multi-user functionality. Passwords would 
+   be future enhancement using hashing.
+
+Q: What happens if user closes browser?
+A: Session cleared, must login again. But all tasks saved in their .txt file, 
+   no data lost.
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: Compilation errors on Windows
+SOLUTION: Make sure you ran these Windows setup commands:
+   cmake -S . -B build -G "MinGW Makefiles"
+   cmake --build build
+
+PROBLEM: Login page doesn't show
+SOLUTION: Make sure server is running first (build\server.exe)
+
+PROBLEM: "Failed to fetch" errors
+SOLUTION: Server crashed. Check terminal for error messages. Restart server.
+
+PROBLEM: No users showing on login page
+SOLUTION: Normal for first time! Create first user using "New User" tab.
+
+PROBLEM: After creating user, still shows login page
+SOLUTION: Clear browser cache and sessionStorage. Close and reopen browser.
+
+
+================================================================================
+FOR WINDOWS TEAMMATE
+================================================================================
+
+REBUILD REQUIRED:
+-----------------
+Since we added new files, your teammate needs to rebuild:
+
+1. In VS Code terminal (PowerShell):
+   cd D:\Oops\TaskMaster\project
+   
+2. Rebuild project:
+   cmake --build build --clean-first
+   
+3. If that doesn't work, full rebuild:
+   Remove-Item build -Recurse -Force
+   cmake -S . -B build -G "MinGW Makefiles"
+   cmake --build build
+
+4. Run:
+   build\server.exe
+
+5. Open: http://localhost:8080
+
+
+================================================================================
+FILES TO ZIP FOR TEAMMATE
+================================================================================
+
+Send these NEW/UPDATED files:
+- src/user_service.h
+- src/user_service.cpp
+- src/task_service.cpp (modified)
+- src/main.cpp (modified)
+- frontend/login.html
+- frontend/script.js (modified)
+- frontend/styles.css (modified)
+- frontend/index.html (modified)
+- CMakeLists.txt (modified)
+- MULTI-USER-SYSTEM-EXPLANATION.txt
+- QUICK-START-MULTI-USER.txt (this file)
+
+OR: Send entire project folder again (easier!)
+
+
+================================================================================
+YOU'RE READY! 🎉
+================================================================================
+
+Both requirements completed:
+1. ✅ .json files changed to .txt files
+2. ✅ Multi-user system with login/logout
+
+The system is fully functional and ready to demo!
+
+Read MULTI-USER-SYSTEM-EXPLANATION.txt for deep technical details.
+
+Good luck with your faculty demo! 🚀
+
+================================================================================

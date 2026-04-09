@@ -1,0 +1,233 @@
+═══════════════════════════════════════════════════════════════
+                    TASKMASTER - RUN INSTRUCTIONS
+═══════════════════════════════════════════════════════════════
+
+📋 PREREQUISITES (ONE-TIME SETUP)
+───────────────────────────────────────────────────────────────
+Mac:
+  - CMake installed (brew install cmake)
+  - C++ compiler (Xcode Command Line Tools)
+
+Windows:
+  - CMake installed (with PATH)
+  - Visual Studio 2022 with C++ Desktop Development
+
+Build the project (FIRST TIME ONLY):
+  Mac:     cmake -S . -B build && cmake --build build
+  Windows: cmake -S . -B build -G "Visual Studio 17 2022"
+           cmake --build build --config Release
+
+═══════════════════════════════════════════════════════════════
+                    🚀 HOW TO RUN THE PROJECT
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Open Terminal/Command Prompt
+───────────────────────────────────────────────────────────────
+Mac:     Open Terminal app
+Windows: Press Win+R, type "cmd", press Enter
+
+STEP 2: Navigate to Project Folder
+───────────────────────────────────────────────────────────────
+Mac:     cd /Users/keerthinidhiar/Documents/repos/project
+Windows: cd C:\path\to\project
+
+STEP 3: Start the Server
+───────────────────────────────────────────────────────────────
+Mac:     ./build/server
+Windows: build\Release\server.exe
+
+You should see:
+  ===========================================
+  📋 To-Do List & Planner Server
+  ===========================================
+  Dashboard: http://localhost:8080
+  ===========================================
+  (2026-04-04 ...) [INFO] Crow/master server is running...
+
+STEP 4: Open Your Browser
+───────────────────────────────────────────────────────────────
+Go to: http://localhost:8080
+
+STEP 5: Use the Application!
+───────────────────────────────────────────────────────────────
+✓ Click "+ New Task" to add tasks
+✓ Click checkbox to mark tasks complete
+✓ Click pencil icon to edit tasks
+✓ Click trash icon to delete tasks
+✓ Use sidebar to filter by category
+✓ View Calendar and Analytics tabs
+
+═══════════════════════════════════════════════════════════════
+                    🛑 HOW TO STOP THE SERVER
+═══════════════════════════════════════════════════════════════
+
+In the terminal where server is running:
+  Press: Ctrl + C
+
+═══════════════════════════════════════════════════════════════
+                    🔄 WHEN TO REBUILD
+═══════════════════════════════════════════════════════════════
+
+❌ NO REBUILD NEEDED if you change:
+  - frontend/index.html
+  - frontend/styles.css
+  - frontend/script.js
+  → Just refresh your browser (Cmd+R or F5)
+
+✅ YES REBUILD NEEDED if you change:
+  - src/main.cpp
+  - src/task_service.cpp
+  - src/task_service.h
+  - CMakeLists.txt
+
+How to rebuild:
+  1. Stop server (Ctrl+C)
+  2. Mac:     cmake --build build
+     Windows: cmake --build build --config Release
+  3. Restart server (Step 3 above)
+
+═══════════════════════════════════════════════════════════════
+                    🐛 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+Problem: "Port already in use" or "Address already in use"
+Solution (Mac):
+  lsof -ti:8080 | xargs kill -9
+  Then restart server
+
+Solution (Windows):
+  netstat -ano | findstr :8080
+  taskkill /PID <number_shown> /F
+  Then restart server
+
+───────────────────────────────────────────────────────────────
+
+Problem: Can't connect to http://localhost:8080
+Solution:
+  1. Check server is running (terminal should show "running")
+  2. Make sure you typed: http://localhost:8080 (not https)
+  3. Try: http://127.0.0.1:8080
+  4. Check firewall isn't blocking port 8080
+
+───────────────────────────────────────────────────────────────
+
+Problem: Server crashes on start
+Solution:
+  1. Check if port 8080 is free (see first problem)
+  2. Check data/tasks.json exists and is valid JSON
+  3. Try running with administrator/sudo permissions
+
+───────────────────────────────────────────────────────────────
+
+Problem: Tasks not saving
+Solution:
+  1. Check data/tasks.json file exists
+  2. Check file permissions (should be writable)
+  3. Check server terminal for error messages
+
+═══════════════════════════════════════════════════════════════
+                    📂 PROJECT STRUCTURE
+═══════════════════════════════════════════════════════════════
+
+project/
+├── build/               Build files (Mac: build/server)
+│   └── Release/        (Windows: build/Release/server.exe)
+├── src/                C++ backend source code
+│   ├── main.cpp        Server and API endpoints
+│   ├── task_service.h  Task management header
+│   └── task_service.cpp Task management implementation
+├── frontend/           Website files
+│   ├── index.html      Main page structure
+│   ├── styles.css      Blue gradient theme
+│   └── script.js       Frontend logic
+├── data/               Data storage
+│   └── tasks.json      All your tasks (JSON format)
+└── CMakeLists.txt      Build configuration
+
+═══════════════════════════════════════════════════════════════
+                    💾 DATA PERSISTENCE
+═══════════════════════════════════════════════════════════════
+
+Your tasks are saved in: data/tasks.json
+
+This file:
+  ✓ Automatically saves when you add/edit/delete tasks
+  ✓ Survives server restarts
+  ✓ Survives computer restarts
+  ✓ Can be backed up by copying the file
+
+To start fresh:
+  1. Stop server (Ctrl+C)
+  2. Delete or rename data/tasks.json
+  3. Restart server (creates new empty file)
+
+To backup your tasks:
+  Copy data/tasks.json to safe location
+
+═══════════════════════════════════════════════════════════════
+                    🎬 DEMO WORKFLOW
+═══════════════════════════════════════════════════════════════
+
+1. Start server: ./build/server (Mac) or build\Release\server.exe (Windows)
+2. Open browser: http://localhost:8080
+3. Show dashboard with stats cards
+4. Add a task manually using "+ New Task" button
+5. Mark a task complete by clicking checkbox
+6. Switch to Calendar view → show task on calendar
+7. Switch to Analytics view → show charts
+8. Filter by category using sidebar
+9. Edit/delete tasks using icons
+10. Show that tasks persist (refresh browser)
+
+═══════════════════════════════════════════════════════════════
+                    📊 FEATURES TO DEMONSTRATE
+═══════════════════════════════════════════════════════════════
+
+Dashboard:
+  ✓ Total tasks, Pending, Completed counts
+  ✓ Completion rate percentage
+  ✓ Task list with status indicators
+  ✓ Priority badges (High/Medium/Low)
+
+Task Management:
+  ✓ Add task with title, description, category, priority
+  ✓ Set due date and time
+  ✓ Add reminder time
+  ✓ Add notes
+  ✓ Mark complete/incomplete
+  ✓ Edit existing tasks
+  ✓ Delete tasks
+
+Categories:
+  ✓ Work, Study, Shopping, Personal, Movies, Wishlist
+  ✓ Filter by category
+  ✓ Color-coded badges
+
+Views:
+  ✓ Dashboard - Overview and stats
+  ✓ All Tasks - Complete task list
+  ✓ Calendar - Monthly view with task markers
+  ✓ Analytics - Bar chart (weekly) + Pie chart (categories)
+
+═══════════════════════════════════════════════════════════════
+                    ✅ QUICK REFERENCE
+═══════════════════════════════════════════════════════════════
+
+START:
+  Mac:     ./build/server
+  Windows: build\Release\server.exe
+
+STOP:
+  Ctrl + C
+
+REBUILD:
+  Mac:     cmake --build build
+  Windows: cmake --build build --config Release
+
+URL:
+  http://localhost:8080
+
+DATA FILE:
+  data/tasks.json
+
+═══════════════════════════════════════════════════════════════

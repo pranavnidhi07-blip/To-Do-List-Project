@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List & Planner</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <h1><i class="fas fa-clipboard-list"></i> TaskMaster</h1>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn-new-task" onclick="openTaskModal()">
+                <i class="fas fa-plus"></i> New Task
+            </button>
+            <div class="profile">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-name">Loading...</span>
+                <button class="btn-logout" onclick="logout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav>
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-view="tasks">
+                    <i class="fas fa-tasks"></i> All Tasks
+                </a>
+                <a href="#" class="nav-item" data-view="calendar">
+                    <i class="fas fa-calendar-alt"></i> Calendar
+                </a>
+                <a href="#" class="nav-item" data-view="analytics">
+                    <i class="fas fa-chart-pie"></i> Analytics
+                </a>
+            </nav>
+            
+            <div class="categories-section">
+                <h3>Quick Lists</h3>
+                <a href="#" class="category-item" data-category="study">
+                    <i class="fas fa-book"></i> Study List
+                </a>
+                <a href="#" class="category-item" data-category="shopping">
+                    <i class="fas fa-shopping-cart"></i> Shopping
+                </a>
+                <a href="#" class="category-item" data-category="movies">
+                    <i class="fas fa-film"></i> Movies
+                </a>
+                <a href="#" class="category-item" data-category="work">
+                    <i class="fas fa-briefcase"></i> Work
+                </a>
+                <a href="#" class="category-item" data-category="personal">
+                    <i class="fas fa-user"></i> Personal
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <h2>Dashboard Overview</h2>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-list-check"></i>
+                        <div class="stat-info">
+                            <h3 id="total-tasks">0</h3>
+                            <p>Total Tasks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <div class="stat-info">
+                            <h3 id="pending-tasks">0</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="stat-info">
+                            <h3 id="completed-tasks">0</h3>
+                            <p>Completed</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-percentage"></i>
+                        <div class="stat-info">
+                            <h3 id="completion-rate">0%</h3>
+                            <p>Completion Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Add Task -->
+                <div class="quick-add-section">
+                    <h3><i class="fas fa-plus-circle"></i> Quick Add Task</h3>
+                    <button class="btn-primary" onclick="openTaskModal()">
+                        <i class="fas fa-plus"></i> New Task
+                    </button>
+                </div>
+
+                <!-- Today's Tasks Widget -->
+                <div class="widget">
+                    <h3><i class="fas fa-calendar-day"></i> Today's Tasks</h3>
+                    <div id="today-tasks-list" class="tasks-list-small">
+                        <p class="empty-message">No tasks for today</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Tasks View -->
+            <div id="tasks-view" class="view">
+                <div class="view-header">
+                    <h2>All Tasks</h2>
+                    <button class="btn-primary" onclick="openTaskModal()">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+
+                <div id="all-tasks-list" class="tasks-list">
+                    <p class="loading">Loading tasks...</p>
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendar-view" class="view">
+                <h2>Calendar 2026</h2>
+                <div id="calendar-container" class="calendar"></div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="view">
+                <h2>Task Analytics</h2>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Weekly Completion (Last 7 Days)</h3>
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Tasks by Category</h3>
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Task</h2>
+                <button class="close-btn" onclick="closeTaskModal()">&times;</button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" id="task-title" placeholder="Enter task title" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="task-description" placeholder="Add description..." rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="task-category">
+                            <option value="personal">Personal</option>
+                            <option value="work">Work</option>
+                            <option value="study">Study</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="movies">Movies</option>
+                            <option value="wishlist">Wishlist</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="task-priority">
+                            <option value="1">High</option>
+                            <option value="2" selected>Medium</option>
+                            <option value="3">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="task-due-date">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Due Time</label>
+                        <input type="time" id="task-due-time">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Reminder Time</label>
+                    <input type="time" id="task-reminder">
+                </div>
+
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="task-notes" placeholder="Additional notes..." rows="4"></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeTaskModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

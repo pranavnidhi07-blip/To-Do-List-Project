@@ -1,0 +1,40 @@
+# SIMPLE START - TaskMaster
+
+## Step 1: Open TWO Terminal Tabs in VS Code
+
+### Terminal 1 - Backend (C++ Server):
+```bash
+cd /Users/keerthinidhiar/Documents/repos/project
+./build/server
+```
+**Keep this terminal open!** It will show "server" and display API requests.
+
+### Terminal 2 - Frontend (Python HTTP Server):
+```bash
+cd /Users/keerthinidhiar/Documents/repos/project/frontend
+python3 -m http.server 8081
+```
+**Keep this terminal open!** It will show file requests.
+
+## Step 2: Open Browser
+Go to: **http://localhost:8081**
+
+---
+
+## To Stop:
+Press **Ctrl+C** in each terminal tab.
+
+---
+
+## If You Need to Rebuild (C++ changes only):
+```bash
+# In Terminal 1:
+# Press Ctrl+C to stop server
+cmake --build build
+./build/server
+```
+
+---
+
+## That's It!
+No scripts, no automation. You control everything manually.

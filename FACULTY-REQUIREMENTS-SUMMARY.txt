@@ -1,0 +1,1164 @@
+================================================================================
+        TO-DO LIST & PLANNER PROJECT - COMPLETE EXPLANATION
+================================================================================
+
+This document explains EVERYTHING about your project in simple terms.
+Read this before your demo to understand every part deeply.
+
+================================================================================
+PART 1: PROJECT OVERVIEW
+================================================================================
+
+WHAT WE BUILT:
+--------------
+A full-stack To-Do List & Planner web application with:
+- Dashboard showing task statistics
+- Task management (add, edit, delete, mark complete)
+- Calendar view for year 2026
+- Analytics with charts (bar chart and pie chart)
+- Beautiful blue gradient design
+
+FULL-STACK MEANS:
+-----------------
+Frontend (what user sees) + Backend (server logic) + Data Storage (JSON file)
+
+We built ALL THREE PARTS from scratch!
+
+
+================================================================================
+PART 2: MOST IMPORTANT FILES TO SHOW FACULTY
+================================================================================
+
+🔥 TOP 5 FILES TO DISCUSS:
+--------------------------
+
+1. src/main.cpp           - The heart of the backend server
+2. src/task_service.cpp   - Business logic for managing tasks
+3. frontend/index.html    - The webpage structure
+4. frontend/script.js     - Frontend logic and API communication
+5. CMakeLists.txt         - Build system configuration
+
+Let's explain each one in detail...
+
+
+================================================================================
+PART 3: BACKEND FILES (C++ SERVER CODE)
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: src/main.cpp (430 lines)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT IT DOES:
+This is the main server application. It does TWO main jobs:
+1. Serves the frontend files (HTML, CSS, JS) to the browser
+2. Handles API requests from the frontend (get tasks, create task, etc.)
+
+WHY IT'S IMPORTANT:
+This file is like a restaurant - it serves food (frontend files) AND takes 
+orders (API requests). It's the bridge between user and data.
+
+KEY PARTS TO EXPLAIN:
+
+1) SERVING FRONTEND FILES:
+   -------------------------
+   When user types "localhost:8080" in browser, this code sends the HTML:
+
+   CROW_ROUTE(app, "/")
+   - This means: "When someone visits the root URL (/), do this..."
+   - Opens frontend/index.html file
+   - Reads all content
+   - Sends it to browser with "Content-Type: text/html" header
+
+   Same for CSS and JavaScript files!
+
+2) API ENDPOINTS (Routes):
+   -------------------------
+   These are like different counters in a restaurant:
+
+   a) GET /api/tasks
+      - When: User opens the app
+      - Does: Retrieves all tasks from task_service
+      - Returns: JSON array of tasks
+      - Example response: [{"id":"abc123", "title":"Buy groceries", ...}]
+
+   b) POST /api/tasks
+      - When: User clicks "Save Task" in the form
+      - Does: Creates new task with data from form
+      - Returns: The newly created task with generated ID
+      - Example: User types "Study C++" → Server saves it → Returns ID
+
+   c) PUT /api/tasks/<id>
+      - When: User edits an existing task
+      - Does: Updates that specific task
+      - Example: Change "Study C++" to "Study C++ pointers"
+
+   d) DELETE /api/tasks/<id>
+      - When: User deletes a task
+      - Does: Removes it permanently
+      - Example: Delete task with ID "abc123"
+
+   e) POST /api/tasks/<id>/toggle
+      - When: User clicks checkbox to mark task complete/incomplete
+      - Does: Flips the "completed" status
+      - Example: Pending → Completed (or vice versa)
+
+   f) GET /api/stats
+      - When: Dashboard loads
+      - Does: Calculates total, pending, completed counts
+      - Returns: {"total": 12, "completed": 3, "pending": 9, ...}
+
+   g) GET /api/stats/weekly
+      - When: Charts section loads
+      - Does: Counts tasks completed in last 7 days
+      - Returns: Data for bar chart
+
+   h) GET /api/stats/categories
+      - When: Charts section loads
+      - Does: Counts tasks in each category
+      - Returns: Data for pie chart
+
+3) CORS HEADERS:
+   -------------
+   Every response includes: "Access-Control-Allow-Origin: *"
+   
+   WHY? Because browser security normally blocks requests between different
+   origins. This header says "Allow anyone to access this API."
+   
+   In our case, we serve frontend from same server, so no CORS issues!
+
+4) ERROR HANDLING:
+   ---------------
+   try-catch blocks everywhere:
+   - If something fails (file not found, invalid data), server sends error
+   - Example: Missing title → Returns 400 error "Title is required"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: src/task_service.cpp (200 lines)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT IT DOES:
+This file contains the BUSINESS LOGIC - the actual work of managing tasks.
+It's separated from main.cpp to keep code organized.
+
+THINK OF IT AS: The kitchen in a restaurant
+- main.cpp takes orders (HTTP requests)
+- task_service.cpp cooks the food (processes data)
+
+KEY FUNCTIONS:
+
+1) create_task(Task task)
+   - Generates random unique ID (like "a8f3d9e2")
+   - Sets creation timestamp
+   - Adds task to internal list
+   - Saves to JSON file
+   - Returns the created task with ID
+
+2) get_all_tasks()
+   - Simply returns all tasks in memory
+   - Used when dashboard loads
+
+3) get_task_by_id(string id)
+   - Searches for specific task by ID
+   - Throws error if not found
+   - Used for updates and deletes
+
+4) update_task(string id, Task new_data)
+   - Finds task by ID
+   - Updates all fields (title, description, etc.)
+   - Keeps same ID and creation date
+   - Saves to file
+   - Returns true/false for success
+
+5) delete_task(string id)
+   - Finds task and removes it from list
+   - Saves updated list to file
+   - Returns true/false
+
+6) toggle_complete(string id)
+   - Finds task
+   - If completed=false → sets to true + adds completion timestamp
+   - If completed=true → sets to false + clears timestamp
+   - Saves to file
+
+7) get_statistics()
+   - Loops through all tasks
+   - Counts: total, completed, pending
+   - Calculates completion rate percentage
+   - Returns JSON: {"total": 12, "completed": 3, "pending": 9, ...}
+
+8) get_weekly_stats()
+   - Looks at tasks completed in last 7 days
+   - Groups by date
+   - Returns array: [{"date": "2026-04-05", "count": 3}, ...]
+   - Used for bar chart
+
+9) get_category_stats()
+   - Counts tasks in each category (Study, Work, Shopping, etc.)
+   - Returns: {"study": 5, "work": 3, "shopping": 2, ...}
+   - Used for pie chart
+
+10) load_from_file() and save_to_file()
+    - Reads/writes data/tasks.json
+    - Converts between C++ Task objects and JSON format
+    - Creates file if doesn't exist
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: src/task_service.h (60 lines)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT IT DOES:
+Header file - defines the structure of a Task and declares all functions.
+
+TASK STRUCTURE:
+---------------
+struct Task {
+    string id;              // Unique identifier: "a8f3d9e2"
+    string title;           // Main text: "Buy groceries"
+    string description;     // Details: "Milk, eggs, bread"
+    string category;        // Group: "shopping"
+    string due_date;        // When due: "2026-04-15"
+    string due_time;        // Time: "14:30"
+    string reminder_time;   // Alert: "2026-04-15T13:30"
+    string notes;           // Extra info
+    int priority;           // 1=High, 2=Medium, 3=Low
+    bool completed;         // true/false
+    string completed_at;    // Timestamp when marked done
+    string created_at;      // When task was created
+};
+
+WHY WE NEED .h FILE:
+- In C++, you "declare" functions in .h file
+- Then "define" (write actual code) in .cpp file
+- This lets other files (like main.cpp) know what functions exist
+- Like a menu in a restaurant - lists what's available!
+
+
+================================================================================
+PART 4: FRONTEND FILES (USER INTERFACE)
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: frontend/index.html (600+ lines)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT IT DOES:
+Creates the structure and layout of the webpage. Like building a house frame.
+
+KEY SECTIONS:
+
+1) <head> section:
+   - Loads external libraries (Chart.js for graphs, Font Awesome for icons)
+   - Links to styles.css for design
+   - Sets page title: "To-Do List & Planner"
+
+2) <div class="toolbar">:
+   - Top bar with app title
+   - "+ New Task" button (opens modal when clicked)
+   - Profile section
+
+3) <div class="sidebar">:
+   - Navigation menu:
+     * Dashboard
+     * All Tasks
+     * Calendar
+     * Analytics
+   - Category quick links:
+     * Study, Shopping, Movies, Work, Personal, Wishlist
+
+4) <div class="stats-grid">:
+   - 4 colored cards showing:
+     * Total Tasks
+     * Pending Tasks
+     * Completed Tasks
+     * Completion Rate (percentage)
+
+5) <div id="taskList">:
+   - Container where tasks appear
+   - Empty at first, filled by JavaScript
+   - Each task shows: checkbox, title, category badge, date, edit/delete icons
+
+6) <div id="calendar-view">:
+   - Full year 2026 calendar
+   - Shows all 12 months in grid layout
+   - Task dates are highlighted
+
+7) <canvas> elements:
+   - Two charts: weeklyChart (bar), categoryChart (pie)
+   - Chart.js library draws on these
+
+8) <div id="taskModal">:
+   - Pop-up form for adding/editing tasks
+   - Input fields: title, description, category, priority, dates, notes
+   - Save and Cancel buttons
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: frontend/styles.css (500+ lines)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT IT DOES:
+Makes everything look beautiful. Like painting and decorating the house.
+
+KEY DESIGN CHOICES:
+
+1) CSS Variables (colors):
+   --primary-blue: #2563eb     → Main blue color
+   --gradient-start: #1e3a8a   → Dark blue (top of gradient)
+   --gradient-end: #3b82f6     → Light blue (bottom)
+   
+   WHY VARIABLES? Easy to change colors throughout entire app!
+
+2) Blue Gradient Theme:
+   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)
+   - Starts dark blue (top-left), fades to light blue (bottom-right)
+   - Applied to toolbar and various elements
+
+3) Layout Techniques:
+   - Flexbox: For toolbar (items in a row)
+   - Grid: For stats cards (4 columns), calendar (7 columns for weekdays)
+   - Position fixed: Sidebar stays in place when scrolling
+
+4) Interactive Effects:
+   - Hover animations (buttons grow slightly)
+   - Smooth transitions (0.3s)
+   - Box shadows for depth
+   - Border radius for rounded corners
+
+5) Responsive Design:
+   @media (max-width: 768px)
+   - On mobile screens, layout adjusts
+   - Stats cards stack vertically
+   - Sidebar collapses
+
+6) Task Card Styling:
+   - White background with shadow
+   - Hover effect (slight lift)
+   - Category badges with different colors
+   - Smooth animations when appearing/disappearing
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: frontend/script.js (495 lines)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⭐ MOST IMPORTANT FILE FOR INTEGRATION ⭐
+
+WHAT IT DOES:
+Makes the page interactive and communicates with backend server.
+This is where FRONTEND-BACKEND INTEGRATION happens!
+
+KEY CONSTANT:
+-------------
+const API_BASE = '/api';
+
+THIS IS CRITICAL! All API calls use this base URL:
+- When we request tasks: fetch(`${API_BASE}/tasks`) → /api/tasks
+- Same server (localhost:8080), so no CORS issues!
+
+MAIN FUNCTIONS:
+
+1) loadTasks()
+   ┌─────────────────────────────────────────────────────────┐
+   │ FRONTEND → BACKEND INTEGRATION EXAMPLE #1               │
+   ├─────────────────────────────────────────────────────────┤
+   │                                                          │
+   │ async function loadTasks() {                            │
+   │     const response = await fetch('/api/tasks');         │
+   │     const tasks = await response.json();                │
+   │     renderAllTasks(tasks);                              │
+   │ }                                                        │
+   │                                                          │
+   │ STEP BY STEP:                                           │
+   │ 1. JavaScript sends HTTP GET request to /api/tasks      │
+   │ 2. C++ server receives request in main.cpp              │
+   │ 3. Server calls task_service.get_all_tasks()            │
+   │ 4. task_service reads from tasks.json                   │
+   │ 5. Converts to JSON and sends back to browser           │
+   │ 6. JavaScript receives JSON array                       │
+   │ 7. Loops through each task and creates HTML elements    │
+   │ 8. User sees tasks on screen!                           │
+   └─────────────────────────────────────────────────────────┘
+
+2) saveTask()
+   ┌─────────────────────────────────────────────────────────┐
+   │ FRONTEND → BACKEND INTEGRATION EXAMPLE #2               │
+   ├─────────────────────────────────────────────────────────┤
+   │                                                          │
+   │ async function saveTask() {                             │
+   │     const taskData = {                                  │
+   │         title: document.getElementById('title').value,  │
+   │         category: document.getElementById('cat').value, │
+   │         ...                                             │
+   │     };                                                  │
+   │                                                          │
+   │     const response = await fetch('/api/tasks', {        │
+   │         method: 'POST',                                 │
+   │         headers: {'Content-Type': 'application/json'},  │
+   │         body: JSON.stringify(taskData)                  │
+   │     });                                                 │
+   │                                                          │
+   │     const newTask = await response.json();              │
+   │     loadTasks(); // Refresh display                     │
+   │ }                                                        │
+   │                                                          │
+   │ STEP BY STEP:                                           │
+   │ 1. User fills form and clicks "Save"                    │
+   │ 2. JavaScript collects data from input fields           │
+   │ 3. Converts to JSON format                              │
+   │ 4. Sends HTTP POST request with JSON in body            │
+   │ 5. C++ server receives in main.cpp POST handler         │
+   │ 6. Parses JSON to C++ Task object                       │
+   │ 7. Calls task_service.create_task()                     │
+   │ 8. Generates ID, saves to tasks.json                    │
+   │ 9. Returns created task back to JavaScript              │
+   │ 10. JavaScript reloads and displays new task            │
+   └─────────────────────────────────────────────────────────┘
+
+3) toggleTaskComplete(taskId)
+   - User clicks checkbox
+   - Sends POST to /api/tasks/{id}/toggle
+   - Server flips completed status
+   - Updates display (task moves to Completed section or vice versa)
+
+4) deleteTask(taskId)
+   - User clicks trash icon
+   - Confirms deletion
+   - Sends DELETE request to /api/tasks/{id}
+   - Server removes from tasks.json
+   - JavaScript removes from display
+
+5) loadStats()
+   - Fetches /api/stats
+   - Updates the 4 stat cards with numbers
+   - Called every time tasks change
+
+6) loadCharts()
+   - Fetches /api/stats/weekly and /api/stats/categories
+   - Uses Chart.js library to draw graphs
+   - Bar chart: weekly completion trend
+   - Pie chart: category distribution
+
+7) showView(viewName)
+   - Switches between Dashboard/All Tasks/Calendar/Analytics
+   - Hides all sections, shows selected one
+   - Updates active menu item
+
+8) Event Listeners:
+   document.addEventListener('DOMContentLoaded', ...)
+   - Waits for page to fully load
+   - Then calls loadTasks() and loadStats()
+   - Attaches click handlers to buttons
+
+
+================================================================================
+PART 5: DATA STORAGE
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: data/tasks.json
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT IT DOES:
+Stores all tasks persistently. Like a notebook where we write everything down.
+
+FORMAT:
+-------
+[
+  {
+    "id": "a8f3d9e2",
+    "title": "Complete C++ assignment",
+    "description": "Finish pointers chapter exercises",
+    "category": "study",
+    "due_date": "2026-04-10",
+    "due_time": "23:59",
+    "priority": 1,
+    "completed": false,
+    "created_at": "2026-04-05T10:30:00"
+  },
+  {
+    "id": "b7e2f1a3",
+    "title": "Buy groceries",
+    "category": "shopping",
+    "completed": true,
+    "completed_at": "2026-04-06T14:20:00"
+  }
+]
+
+WHY JSON?
+---------
+1. Human-readable (you can open and understand it)
+2. Easy to parse in both C++ (nlohmann/json library) and JavaScript (native)
+3. Standard format for web applications
+4. Simple file storage (no database setup needed)
+
+HOW IT WORKS:
+-------------
+- When server starts: Reads file → Loads into memory (C++ vector)
+- When user adds task: Updates memory → Writes entire array back to file
+- When user deletes task: Updates memory → Writes to file
+- When user marks complete: Updates memory → Writes to file
+
+IMPORTANT: File is created automatically if it doesn't exist!
+
+
+================================================================================
+PART 6: BUILD SYSTEM & CONFIGURATION
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILE: CMakeLists.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT IT DOES:
+Build configuration - tells CMake how to compile the project.
+
+THINK OF IT AS: A recipe for building the executable
+
+KEY PARTS:
+
+1) cmake_minimum_required(VERSION 3.15)
+   - Needs at least CMake version 3.15
+
+2) set(CMAKE_CXX_STANDARD 17)
+   - Use modern C++17 features
+
+3) FetchContent_Declare(...):
+   - Downloads libraries from GitHub automatically:
+   
+   a) ASIO (v1.30.2)
+      - Networking library
+      - Handles sockets, HTTP connections
+      - Required by Crow framework
+   
+   b) Crow (v1.2.0)
+      - Web framework (like Express.js for Node, but C++)
+      - Makes HTTP server easy to write
+      - Header-only (no separate compilation)
+   
+   c) nlohmann/json (v3.11.3)
+      - JSON parsing library
+      - Converts JSON ↔ C++ objects
+      - Example: json["title"] = task.title;
+
+4) add_executable(server src/main.cpp src/task_service.cpp)
+   - Compiles these files into server.exe
+
+5) target_link_libraries(...)
+   - Links required libraries to executable
+   - On Windows: adds ws2_32 and mswsock (socket libraries)
+
+6) target_compile_definitions(server PRIVATE ASIO_STANDALONE)
+   - Tells ASIO to work without Boost library
+
+
+================================================================================
+PART 7: LIBRARIES & PACKAGES EXPLAINED
+================================================================================
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ BACKEND LIBRARIES (C++)                                                    │
+└────────────────────────────────────────────────────────────────────────────┘
+
+1. CROW FRAMEWORK
+   ──────────────
+   What: Lightweight web framework for C++
+   Why: Makes building HTTP servers easy
+   Without it: Would need to write low-level socket code (very hard!)
+   
+   What it provides:
+   - CROW_ROUTE macro to define endpoints
+   - Request/response objects
+   - JSON support
+   - Automatic routing
+   - Multithreading support
+   
+   Example usage:
+   CROW_ROUTE(app, "/hello")
+   ([](){
+       return "Hello World!";
+   });
+
+2. ASIO (Asynchronous I/O)
+   ───────────────────────
+   What: Networking library
+   Why: Handles TCP/IP connections, sockets
+   Crow uses: Crow is built on top of ASIO
+   
+   What it provides:
+   - Socket creation and management
+   - Asynchronous operations (non-blocking)
+   - Cross-platform (works on Windows, Mac, Linux)
+   
+   We don't directly use ASIO - Crow uses it internally!
+
+3. nlohmann/json
+   ─────────────
+   What: Modern C++ JSON library
+   Why: Makes working with JSON super easy
+   
+   Without it:
+   - Manual string parsing (nightmare!)
+   - Prone to errors
+   - Lots of code
+   
+   With it:
+   json j;
+   j["name"] = "John";
+   j["age"] = 25;
+   string str = j.dump(); // Converts to JSON string
+   
+   Or reverse:
+   json j = json::parse(str);
+   string name = j["name"];
+
+4. C++ Standard Library
+   ────────────────────
+   What: Built-in libraries that come with C++
+   
+   We use:
+   - <fstream>   : File reading/writing
+   - <sstream>   : String stream operations
+   - <vector>    : Dynamic arrays for storing tasks
+   - <string>    : String manipulation
+   - <random>    : Generating unique IDs
+   - <map>       : Key-value pairs for statistics
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ FRONTEND LIBRARIES (JavaScript)                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+1. CHART.JS (v4.4.0)
+   ─────────────────
+   What: JavaScript library for creating charts
+   Why: Beautiful, animated charts with minimal code
+   
+   We use it for:
+   - Bar chart: Weekly completion trend (last 7 days)
+   - Pie chart: Task distribution by category
+   
+   Without it: Would need to draw SVG/Canvas manually (very complex!)
+   
+   Example usage:
+   new Chart(ctx, {
+       type: 'bar',
+       data: {
+           labels: ['Mon', 'Tue', 'Wed'],
+           datasets: [{
+               label: 'Tasks Completed',
+               data: [3, 5, 2]
+           }]
+       }
+   });
+
+2. Font Awesome (CDN)
+   ──────────────────
+   What: Icon library
+   Why: Professional icons without images
+   
+   We use icons for:
+   - Checkboxes (fa-check)
+   - Trash can (fa-trash)
+   - Edit pencil (fa-edit)
+   - Calendar (fa-calendar)
+   - Sidebar menu items
+   
+   Usage: <i class="fas fa-trash"></i>
+
+3. Browser's Fetch API
+   ───────────────────
+   What: Built-in JavaScript function for HTTP requests
+   Why: Modern, promise-based, cleaner than old XMLHttpRequest
+   
+   Example:
+   fetch('/api/tasks')
+       .then(response => response.json())
+       .then(data => console.log(data));
+
+
+================================================================================
+PART 8: INTEGRATION DEEP DIVE - HOW EVERYTHING CONNECTS
+================================================================================
+
+🔗 THE COMPLETE DATA FLOW 🔗
+
+Let's trace what happens when user adds a task:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP-BY-STEP: USER ADDS "Buy Milk" TASK                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  [1] USER ACTION                                                            │
+│      • User clicks "+ New Task" button                                      │
+│      • Modal popup appears                                                  │
+│                                                                             │
+│  [2] FORM FILLING                                                           │
+│      • User types:                                                          │
+│        - Title: "Buy Milk"                                                  │
+│        - Category: "shopping"                                               │
+│        - Due Date: "2026-04-10"                                             │
+│      • User clicks "Save Task"                                              │
+│                                                                             │
+│  [3] JAVASCRIPT (frontend/script.js)                                        │
+│      • saveTask() function is called                                        │
+│      • Collects data from form inputs:                                      │
+│        const taskData = {                                                   │
+│            title: "Buy Milk",                                               │
+│            category: "shopping",                                            │
+│            due_date: "2026-04-10"                                           │
+│        };                                                                   │
+│      • Converts to JSON string: '{"title":"Buy Milk",...}'                  │
+│                                                                             │
+│  [4] HTTP REQUEST SENT                                                      │
+│      • fetch('/api/tasks', {                                                │
+│            method: 'POST',                                                  │
+│            headers: {'Content-Type': 'application/json'},                   │
+│            body: JSON.stringify(taskData)                                   │
+│        })                                                                   │
+│      • Browser sends HTTP POST request to localhost:8080/api/tasks          │
+│      • Request travels through network stack to C++ server                  │
+│                                                                             │
+│  [5] C++ SERVER RECEIVES (src/main.cpp)                                     │
+│      • Crow framework routes to: CROW_ROUTE(app, "/api/tasks")              │
+│      • Checks: req.method == crow::HTTPMethod::Post                         │
+│      • Parses JSON body: auto body = json::parse(req.body)                  │
+│      • Creates Task object:                                                 │
+│        Task task;                                                           │
+│        task.title = body["title"];        // "Buy Milk"                     │
+│        task.category = body["category"];  // "shopping"                     │
+│        task.due_date = body["due_date"];  // "2026-04-10"                   │
+│      • Validates: if (task.title.empty()) return error                      │
+│                                                                             │
+│  [6] BUSINESS LOGIC (src/task_service.cpp)                                  │
+│      • Calls: auto created_task = task_service.create_task(task)            │
+│      • create_task() does:                                                  │
+│        a) Generates random ID: "b7e2f1a3"                                   │
+│        b) Sets created_at: "2026-04-06T15:30:00"                            │
+│        c) Sets completed: false                                             │
+│        d) Adds to internal tasks vector: tasks.push_back(task)              │
+│        e) Calls save_to_file()                                              │
+│                                                                             │
+│  [7] FILE WRITE (data/tasks.json)                                           │
+│      • save_to_file() opens tasks.json                                      │
+│      • Converts all tasks to JSON array                                     │
+│      • Writes to file:                                                      │
+│        [                                                                    │
+│          { "id": "a8f3d9e2", "title": "Old Task", ... },                    │
+│          { "id": "b7e2f1a3", "title": "Buy Milk", ... }  ← NEW!             │
+│        ]                                                                    │
+│      • File saved to disk ✓                                                 │
+│                                                                             │
+│  [8] RESPONSE BACK (src/main.cpp)                                           │
+│      • Converts created_task to JSON:                                       │
+│        json response = task_service.task_to_json(created_task);             │
+│      • Sends HTTP 201 response:                                             │
+│        {                                                                    │
+│            "id": "b7e2f1a3",                                                │
+│            "title": "Buy Milk",                                             │
+│            "category": "shopping",                                          │
+│            "due_date": "2026-04-10",                                        │
+│            "completed": false,                                              │
+│            "created_at": "2026-04-06T15:30:00"                              │
+│        }                                                                    │
+│      • Response travels back through network to browser                     │
+│                                                                             │
+│  [9] JAVASCRIPT RECEIVES (frontend/script.js)                               │
+│      • const newTask = await response.json();                               │
+│      • Calls loadTasks() to refresh display                                 │
+│                                                                             │
+│  [10] DISPLAY UPDATE (frontend/index.html + script.js)                      │
+│       • loadTasks() fetches all tasks again                                 │
+│       • renderAllTasks() creates HTML for each task                         │
+│       • Creates new task card:                                              │
+│         <div class="task-card">                                             │
+│             <input type="checkbox">                                         │
+│             <span>Buy Milk</span>                                           │
+│             <span class="category-badge">shopping</span>                    │
+│             <button onclick="deleteTask('b7e2f1a3')">🗑</button>            │
+│         </div>                                                              │
+│       • Inserts into <div id="taskList">                                    │
+│                                                                             │
+│  [11] USER SEES                                                             │
+│       • New task "Buy Milk" appears in list                                 │
+│       • Modal closes                                                        │
+│       • Stats update: Total Tasks increases                                 │
+│       • Animation plays (smooth appearance)                                 │
+│                                                                             │
+│  ✅ TASK SUCCESSFULLY ADDED!                                                │
+│                                                                             │
+│  If user closes browser and reopens:                                        │
+│  → Server reads tasks.json                                                  │
+│  → "Buy Milk" still there!                                                  │
+│  → Data persisted! ✓                                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+🔗 ANOTHER EXAMPLE: USER MARKS TASK COMPLETE 🔗
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP-BY-STEP: USER CHECKS OFF "Buy Milk"                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  [1] User clicks checkbox next to "Buy Milk"                                │
+│  [2] JavaScript: onclick="toggleTaskComplete('b7e2f1a3')"                   │
+│  [3] Sends POST to: /api/tasks/b7e2f1a3/toggle                              │
+│  [4] C++ server finds task by ID                                            │
+│  [5] Flips: completed = !completed (false → true)                           │
+│  [6] Sets: completed_at = "2026-04-06T15:45:00"                             │
+│  [7] Saves to tasks.json                                                    │
+│  [8] Returns updated task                                                   │
+│  [9] JavaScript re-renders task with strikethrough text                     │
+│  [10] Stats update: Completed count increases                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+KEY INTEGRATION POINTS:
+
+1. SAME ORIGIN = NO CORS ISSUES
+   -------------------------------
+   Frontend files served from: localhost:8080/
+   API endpoints at: localhost:8080/api/
+   Same server, same port → Browser allows requests!
+
+2. JSON AS COMMON LANGUAGE
+   -------------------------
+   C++ speaks: Task objects (struct)
+   JavaScript speaks: Objects {title: "...", ...}
+   JSON bridges: Both can read/write JSON!
+
+3. HTTP AS COMMUNICATION PROTOCOL
+   --------------------------------
+   Frontend and backend don't share memory
+   They communicate via HTTP requests/responses
+   Like two people talking via walkie-talkie!
+
+4. RESTFUL API DESIGN
+   -------------------
+   GET /api/tasks          → Read all
+   POST /api/tasks         → Create
+   PUT /api/tasks/:id      → Update
+   DELETE /api/tasks/:id   → Delete
+   
+   Standard pattern, easy to understand!
+
+
+================================================================================
+PART 9: COMMON FACULTY QUESTIONS & ANSWERS
+================================================================================
+
+Q1: Why did you choose C++ for backend instead of Node.js or Python?
+────────────────────────────────────────────────────────────────────
+A: We wanted to demonstrate:
+   • Systems programming skills (memory management, compilation)
+   • Performance (C++ is faster than interpreted languages)
+   • Integration of modern C++ with web technologies
+   • Use of modern frameworks like Crow that make C++ web dev practical
+   
+   It shows we can work beyond just scripting languages!
+
+Q2: How does the frontend communicate with backend?
+────────────────────────────────────────────────────
+A: Via HTTP requests using the Fetch API:
+   • Frontend (JavaScript) sends HTTP requests to API endpoints
+   • Backend (C++ server) processes requests and sends responses
+   • Data format: JSON (works natively in both JavaScript and C++ with library)
+   • Same server architecture (port 8080) eliminates CORS issues
+   
+   Example: fetch('/api/tasks') → C++ CROW_ROUTE → task_service → JSON response
+
+Q3: What happens if server crashes?
+────────────────────────────────────
+A: All data is preserved because:
+   • Tasks stored in tasks.json file on disk
+   • Every create/update/delete immediately writes to file
+   • When server restarts, TaskService constructor loads from file
+   • No data loss!
+   
+   This is persistent storage vs in-memory only.
+
+Q4: Why JSON file instead of a database?
+─────────────────────────────────────────
+A: For this project scope:
+   • Simpler setup (no database installation/configuration)
+   • Demonstrates file I/O operations
+   • Sufficient for single-user application
+   • JSON is human-readable (easy to debug)
+   
+   For production with many users: Would use MySQL/PostgreSQL
+
+Q5: Can you explain the build process?
+───────────────────────────────────────
+A: Three stages:
+   1. Configure: cmake -S . -B build
+      • Reads CMakeLists.txt
+      • Downloads dependencies from GitHub (Crow, ASIO, nlohmann/json)
+      • Generates build files
+   
+   2. Compile: cmake --build build
+      • Compiles src/main.cpp and src/task_service.cpp
+      • Links libraries
+      • Creates executable: build/server.exe
+   
+   3. Run: build/server.exe
+      • Starts HTTP server on port 8080
+      • Loads tasks from JSON file
+      • Waits for requests
+
+Q6: What are those CROW_ROUTE things?
+──────────────────────────────────────
+A: Macros provided by Crow framework for defining routes:
+   • Route = URL pattern + handler function
+   • When request matches URL, handler runs
+   
+   Example:
+   CROW_ROUTE(app, "/api/tasks")
+   ([&task_service](const crow::request& req) {
+       // This code runs when someone visits /api/tasks
+       return task_service.get_all_tasks();
+   });
+   
+   It's like: "When someone knocks on this door (/api/tasks), do this."
+
+Q7: How do you handle errors?
+──────────────────────────────
+A: Multiple layers:
+   • Try-catch blocks in C++ to catch exceptions
+   • Validation (e.g., title cannot be empty)
+   • HTTP status codes (400 = bad request, 404 = not found, 500 = server error)
+   • Frontend checks response status and shows error messages
+   
+   Example: Missing title → Server returns 400 with JSON {"error": "Title required"}
+
+Q8: What is localhost:8080?
+────────────────────────────
+A: localhost = 127.0.0.1 = Your own computer (loopback address)
+   8080 = Port number (like a door number)
+   
+   Full URL: http://localhost:8080
+   • http:// = Protocol
+   • localhost = This computer
+   • :8080 = Port (commonly used for development, alternative to 80)
+   
+   Only accessible from your machine (not on internet)
+
+Q9: How does the calendar know which dates have tasks?
+───────────────────────────────────────────────────────
+A: JavaScript logic in renderCalendar():
+   • Loads all tasks
+   • For each task with due_date, extracts the date
+   • When rendering calendar, checks if current date matches any task date
+   • If match: Adds special CSS class to highlight that day
+   • User sees: Days with tasks are visually different (colored dot, etc.)
+
+Q10: Can you extend this project?
+──────────────────────────────────
+A: Many possibilities:
+   • Add user authentication (login/logout)
+   • Multiple users with separate task lists
+   • Real-time notifications for reminders
+   • Drag-and-drop task reordering
+   • Recurring tasks (daily/weekly)
+   • Export tasks to PDF
+   • Mobile app version
+   • Database integration (PostgreSQL)
+   • Task sharing/collaboration features
+
+
+================================================================================
+PART 10: DEMO PREPARATION CHECKLIST
+================================================================================
+
+BEFORE DEMO:
+------------
+☐ Server is running (build\server.exe)
+☐ Browser open at localhost:8080
+☐ At least 5-10 sample tasks loaded
+☐ Tasks in different categories
+☐ Some tasks marked complete, some pending
+☐ Understand every file's purpose (see above)
+☐ Can explain integration flow
+☐ Know all libraries used and why
+
+WHAT TO SHOW:
+--------------
+1. Dashboard Overview
+   • Show stats cards updating in real-time
+   • Explain what each number means
+
+2. Add New Task
+   • Click "+ New Task"
+   • Fill out form (explain each field)
+   • Save and watch it appear
+   • Mention: "This sends HTTP POST to C++ server"
+
+3. Mark Task Complete
+   • Check a task
+   • Show it moves to completed section
+   • Mention: "Sends POST to /api/tasks/:id/toggle"
+
+4. Category Filtering
+   • Click category in sidebar (e.g., "Study")
+   • Only study tasks show
+   • Mention: "Client-side filtering with JavaScript"
+
+5. Calendar View
+   • Switch to calendar
+   • Point out dates with tasks
+   • Explain: "Due dates are visually highlighted"
+
+6. Analytics
+   • Show bar chart (weekly trend)
+   • Show pie chart (category distribution)
+   • Mention: "Chart.js library, data from C++ API"
+
+7. Edit/Delete Task
+   • Edit a task, show it updates
+   • Delete a task, show it disappears
+   • Mention: "PUT and DELETE HTTP methods"
+
+8. Show Code (if asked)
+   • main.cpp: API endpoints
+   • task_service.cpp: Business logic
+   • script.js: Frontend integration
+   • tasks.json: Data persistence
+
+TALKING POINTS:
+---------------
+• "Full-stack application: C++ backend, JavaScript frontend"
+• "RESTful API with 10+ endpoints"
+• "Single-server architecture eliminates CORS issues"
+• "JSON file persistence - data survives server restart"
+• "Modern C++17 with Crow framework"
+• "Responsive design with blue gradient theme"
+• "Chart.js for data visualization"
+• "CMake build system with automatic dependency management"
+
+
+================================================================================
+PART 11: TECHNICAL TERMS GLOSSARY
+================================================================================
+
+API (Application Programming Interface)
+  → Set of endpoints that frontend calls to communicate with backend
+  → Example: /api/tasks is an API endpoint
+
+REST (Representational State Transfer)
+  → Architecture style where URLs represent resources
+  → HTTP methods (GET, POST, PUT, DELETE) represent actions
+  → Example: GET /api/tasks = retrieve tasks
+
+HTTP Methods
+  → GET: Retrieve data (read-only)
+  → POST: Create new resource
+  → PUT: Update existing resource
+  → DELETE: Remove resource
+  → OPTIONS: Check what methods are allowed (CORS)
+
+JSON (JavaScript Object Notation)
+  → Text format for data exchange
+  → Example: {"name": "John", "age": 25}
+  → Both JavaScript and C++ can read/write it
+
+CORS (Cross-Origin Resource Sharing)
+  → Browser security feature
+  → Blocks requests between different origins (different domain/port)
+  → We avoid it by serving frontend from same server
+
+Endpoint
+  → URL path that handles specific request
+  → Example: /api/tasks/category/study
+
+Route/Routing
+  → Matching URL to handler function
+  → Crow does this with CROW_ROUTE macro
+
+Request
+  → Message sent from client to server
+  → Contains: method, URL, headers, body
+
+Response
+  → Message sent from server to client
+  → Contains: status code, headers, body (usually JSON)
+
+Status Codes
+  → 200 OK: Success
+  → 201 Created: Successfully created
+  → 400 Bad Request: Client error (invalid data)
+  → 404 Not Found: Resource doesn't exist
+  → 500 Internal Server Error: Server crashed
+
+Header-Only Library
+  → Library that's just .h/.hpp files (no .cpp to compile)
+  → Example: Crow, nlohmann/json
+  → Advantage: Easier to integrate
+
+Build System
+  → Tool that automates compilation process
+  → We use CMake
+  → Reads CMakeLists.txt, generates Makefiles, compiles code
+
+Dependency Management
+  → Handling external libraries
+  → CMake's FetchContent downloads from GitHub automatically
+
+Asynchronous
+  → Non-blocking operations
+  → Server can handle multiple requests at once
+  → ASIO provides this capability
+
+Persistent Storage
+  → Data that survives program restart
+  → We use JSON file
+  → Alternative: Database (MySQL, PostgreSQL)
+
+
+================================================================================
+FINAL TIPS FOR SUCCESSFUL DEMO
+================================================================================
+
+1. BE CONFIDENT
+   • You built this! You understand it!
+   • If asked something you don't know, say: "That's a great extension idea!"
+
+2. SHOW, DON'T JUST TELL
+   • Actually demonstrate features working
+   • Let faculty see the interaction
+
+3. HAVE BACKUP
+   • If server crashes, know how to restart: build\server.exe
+   • If port busy, explain: "Another program using port 8080"
+
+4. CONNECT TO COURSE CONCEPTS
+   • Mention C++ concepts: classes, structs, vectors, file I/O
+   • Mention web concepts: HTTP, REST, JSON, client-server
+
+5. EMPHASIZE LEARNING
+   • "We learned about web frameworks in C++"
+   • "We learned integration between frontend and backend"
+   • "We practiced modern software development practices"
+
+6. BE HONEST
+   • If asked about something you didn't implement: "That's a future enhancement"
+   • Faculty appreciate honesty over bluffing
+
+7. PREPARE FOR "WHAT IF" QUESTIONS
+   • "What if 1000 users?" → "Would need database and scalability improvements"
+   • "What about security?" → "Would add authentication and input sanitization"
+   • "Mobile version?" → "Could create REST API clients for iOS/Android"
+
+
+================================================================================
+YOU ARE READY! 🚀
+================================================================================
+
+You have a fully functional, well-architected, impressive project.
+You understand how every part works and how they connect together.
+Go show your faculty what you've built!
+
+Good luck! 🎉
+
+================================================================================

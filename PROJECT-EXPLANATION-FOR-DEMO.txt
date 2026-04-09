@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - To-Do List & Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            font-size: 60px;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #2563eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #334155;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .user-card {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-card:hover {
+            border-color: #2563eb;
+            background: #f0f9ff;
+            transform: translateX(5px);
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .user-info h3 {
+            color: #1e3a8a;
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .user-info p {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Checkmark Animation */
+        @keyframes successCheckmark {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-45deg);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.2) rotate(0deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .success-icon {
+            display: inline-block;
+            animation: successCheckmark 0.6s ease-out;
+            color: #16a34a;
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        /* Tab Switch Animation */
+        .tab-content {
+            animation: fadeSlideIn 0.4s ease-out;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Input Focus Glow */
+        input:focus {
+            animation: inputGlow 0.3s ease-out;
+        }
+
+        @keyframes inputGlow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            }
+        }
+
+        /* Button Click Effect */
+        .btn-primary:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Error Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .error-message.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Loading overlay fade */
+        .loading {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <h1>To-Do List & Planner</h1>
+            <p class="subtitle">Multi-User Task Management System</p>
+        </div>
+
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('existing', event)">
+                <i class="fas fa-sign-in-alt"></i> Existing User
+            </button>
+            <button class="tab-button" onclick="switchTab('new', event)">
+                <i class="fas fa-user-plus"></i> New User
+            </button>
+        </div>
+
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #64748b;">Loading...</p>
+        </div>
+
+        <!-- Existing User Tab -->
+        <div id="existing-tab" class="tab-content active">
+            <form id="login-form" onsubmit="loginWithPassword(event)">
+                <div class="form-group">
+                    <label for="login_username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="login_username" 
+                        name="login_username" 
+                        placeholder="Enter your username" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="login_password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="login_password" 
+                        name="login_password" 
+                        placeholder="Enter your password" 
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </button>
+            </form>
+        </div>
+
+        <!-- New User Tab -->
+        <div id="new-tab" class="tab-content">
+            <form id="create-user-form" onsubmit="createUser(event)">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Enter username (e.g., john_doe)" 
+                        required
+                        pattern="[a-zA-Z0-9_]+"
+                        title="Only letters, numbers, and underscores allowed"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="display_name">
+                        <i class="fas fa-id-card"></i> Display Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="display_name" 
+                        name="display_name" 
+                        placeholder="Enter full name (e.g., John Doe)" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter password" 
+                        required
+                        minlength="4"
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account & Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        // Check if already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = sessionStorage.getItem('current_user');
+            if (currentUser) {
+                // Already logged in, redirect to main app
+                window.location.href = '/';
+            }
+        });
+
+        // Switch between tabs
+        function switchTab(tab, event) {
+            console.log('Switching to tab:', tab);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (event && event.target) {
+                event.target.closest('.tab-button').classList.add('active');
+            }
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetTab = document.getElementById(`${tab}-tab`);
+            if (targetTab) {
+                targetTab.classList.add('active');
+                console.log('Activated tab:', tab + '-tab');
+            } else {
+                console.error('Tab not found:', tab + '-tab');
+            }
+
+            // Clear messages
+            hideError();
+            hideSuccess();
+        }
+
+        // Login with password
+        async function loginWithPassword(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('login_username').value.trim();
+            const password = document.getElementById('login_password').value;
+
+            if (!username || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            try {
+                showLoading();
+                
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store user info in session storage
+                    sessionStorage.setItem('current_user', data.username);
+                    sessionStorage.setItem('display_name', data.display_name);
+                    
+                    showSuccess(`Welcome back, ${data.display_name}!`);
+                    
+                    // Redirect to main app after short delay
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showError(data.error || 'Invalid username or password.');
+                    hideLoading();
+                }
+            } catch (error) {
+                console.error('Error logging in:', error);
+                showError('Login failed. Please check your connection.');
+                hideLoading();
+            }
+        }
+
+        // Load existing users (removed - now using password login)
+        async function loadUsers() {
+            // No longer needed - users login with username/password
+        }
+
+        // Login existing user (removed - now using password)
+        async function loginUser(username, displayName) {
+            // No longer needed
+        }
+
+        // Create new user
+        async function createUser(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const displayName = document.getElementById('display_name').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !displayName || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            try {
+                showLoading();
+                
+                const response = await fetch(`${API_BASE}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        display_name: displayName,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Auto-login the new user
+                    const loginResponse = await fetch(`${API_BASE}/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (loginResponse.ok) {
+                        const loginData = await loginResponse.json();
+                        sessionStorage.setItem('current_user', username);
+                        sessionStorage.setItem('display_name', displayName);
+                        
+                        showSuccess(`Account created! Welcome, ${displayName}!`);
+                        
+                        // Redirect to main app
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 1500);
+                    }
+                } else {
+                    showError(data.error || 'Failed to create account. Username may already exist.');
+                    hideLoading();
+                }
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showError('Failed to create account. Please try again.');
+                hideLoading();
+            }
+        }
+
+        // UI Helper functions
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.classList.add('shake');
+            setTimeout(() => {
+                errorDiv.classList.remove('shake');
+            }, 500);
+        }
+
+        function hideError() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.innerHTML = '<i class="fas fa-check-circle success-icon"></i>' + message;
+            successDiv.style.display = 'block';
+        }
+
+        function hideSuccess() {
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('existing-tab').classList.remove('active');
+            document.getElementById('new-tab').classList.remove('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            // Re-activate the currently selected tab
+            const activeTabButton = document.querySelector('.tab-button.active');
+            if (activeTabButton) {
+                const tabName = activeTabButton.onclick.toString().match(/'(\w+)'/);
+                if (tabName && tabName[1]) {
+                    document.getElementById(`${tabName[1]}-tab`).classList.add('active');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+# C++ Crow Server Project - Setup Guide
+
+This guide will help you set up and run a C++ web server using the Crow framework and nlohmann/json library on macOS.
+
+## Prerequisites
+
+You need the following tools installed on your Mac:
+
+### 1. Install Homebrew (if not already installed)
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+### 2. Install CMake and C++ Compiler
+```bash
+brew install cmake
+brew install llvm
+```
+
+Alternatively, you can install Xcode Command Line Tools:
+```bash
+xcode-select --install
+```
+
+## Project Structure
+
+```
+project/
+├── CMakeLists.txt       # Build configuration
+├── src/
+│   └── main.cpp        # Server source code
+├── build/              # Build directory (generated)
+└── README.md           # This file
+```
+
+## Build and Run Instructions
+
+### Step 1: Navigate to Project Directory
+```bash
+cd /Users/keerthinidhiar/Documents/repos/project
+```
+
+### Step 2: Configure the Project with CMake
+CMake will automatically download Crow and nlohmann/json dependencies:
+```bash
+cmake -B build -S .
+```
+
+This step might take a few minutes the first time as it downloads the dependencies.
+
+### Step 3: Build the Project
+```bash
+cmake --build build
+```
+
+### Step 4: Run the Server
+```bash
+./build/server
+```
+
+You should see:
+```
+Server starting on http://localhost:8080
+Available endpoints:
+  - GET http://localhost:8080/
+  - GET http://localhost:8080/api/hello
+  - GET http://localhost:8080/api/greet/<name>
+```
+
+## Testing the Server
+
+Open a new terminal window and test the endpoints:
+
+### Test basic endpoint:
+```bash
+curl http://localhost:8080/
+```
+Expected output: `Hello, World! Welcome to Crow C++ Server!`
+
+### Test JSON endpoint:
+```bash
+curl http://localhost:8080/api/hello
+```
+Expected output: `{"message":"Hello from Crow!","status":"success","timestamp":...}`
+
+### Test parameterized endpoint:
+```bash
+curl http://localhost:8080/api/greet/John
+```
+Expected output: `{"greeting":"Hello, John!","status":"success"}`
+
+## Troubleshooting
+
+### Issue: CMake not found
+**Solution:** Install CMake using Homebrew:
+```bash
+brew install cmake
+```
+
+### Issue: C++ compiler not found
+**Solution:** Install Xcode Command Line Tools:
+```bash
+xcode-select --install
+```
+
+### Issue: Port 8080 already in use
+**Solution:** Either:
+1. Stop the process using port 8080
+2. Change the port in `src/main.cpp` (line with `app.port(8080)`)
+
+### Issue: Build fails with "thread not found"
+**Solution:** This is usually handled by CMake, but ensure you have the latest Xcode Command Line Tools installed.
+
+## Next Steps
+
+Now that you have a working server, you can:
+1. Add more endpoints in `src/main.cpp`
+2. Implement POST, PUT, DELETE methods
+3. Add JSON request body parsing
+4. Connect to a database
+5. Add middleware for logging, authentication, etc.
+
+## Useful Resources
+
+- [Crow Documentation](https://crowcpp.org/master/)
+- [nlohmann/json Documentation](https://json.nlohmann.me/)
+- [CMake Tutorial](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
+
+## Quick Rebuild Commands
+
+After making changes to `src/main.cpp`:
+```bash
+# Rebuild
+cmake --build build
+
+# Run
+./build/server
+```
+
+Or combine them:
+```bash
+cmake --build build && ./build/server
+```

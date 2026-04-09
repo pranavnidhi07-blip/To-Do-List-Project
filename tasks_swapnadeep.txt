@@ -1,0 +1,197 @@
+# 🎯 COMPLETE WORKFLOW - TaskMaster
+
+## ⚡ I Fixed Everything! Here's What Changed:
+
+### ✅ Problems Fixed:
+1. **Duplicate tasks** - Cleared tasks.json, created new `start.sh` that DOESN'T auto-add tasks
+2. **CORS issue** - Fixed OPTIONS handler for browser requests
+3. **Confusing workflow** - Created simple scripts and clear instructions below
+
+---
+
+## 🚀 START HERE - Complete Instructions
+
+### Step 1: Stop Everything First
+```bash
+pkill server && lsof -ti:8081 | xargs kill -9
+```
+
+### Step 2: Rebuild (because I fixed CORS)
+```bash
+cmake --build build
+```
+
+### Step 3: Make New Script Executable
+```bash
+chmod +x start.sh
+```
+
+### Step 4: Start Servers (NEW WAY!)
+```bash
+./start.sh
+```
+
+You should see:
+```
+✅ TaskMaster is READY!
+📊 Backend API:  http://localhost:8080
+🌐 Frontend App: http://localhost:8081
+```
+
+### Step 5: Open Browser
+Open: **http://localhost:8081**
+
+### Step 6: Try Adding a Task!
+1. Click **"+ New Task"** button
+2. Fill in:
+   - Title: "My Demo Task"
+   - Description: "Testing manual addition"
+   - Category: Choose any
+   - Priority: Choose 1-3
+   - Due Date: Pick a date
+3. Click **"Save Task"**
+4. It should appear in your task list! 🎉
+
+---
+
+## 📝 Want Sample Data for Demo?
+
+**In a NEW terminal tab** (keep servers running in first tab):
+```bash
+./add-sample-tasks.sh
+```
+
+Then refresh browser (Cmd+R). You'll see 12 sample tasks.
+
+**⚠️ IMPORTANT:** Only run this ONCE! Running it again adds duplicates.
+
+---
+
+## 🔄 Daily Workflow (After Today)
+
+### Starting TaskMaster:
+```bash
+./start.sh
+```
+Then open: http://localhost:8081
+
+### Stopping TaskMaster:
+```bash
+pkill server && lsof -ti:8081 | xargs kill -9
+```
+
+### That's It!
+
+---
+
+## 🛠️ When to Rebuild vs Just Refresh
+
+### Just Refresh Browser (Cmd+R):
+- Changed `frontend/index.html`
+- Changed `frontend/styles.css`
+- Changed `frontend/script.js`
+- Added tasks through the UI
+
+### Rebuild + Restart:
+- Changed `src/main.cpp`
+- Changed `src/task_service.cpp`
+- Changed `src/task_service.h`
+
+**Rebuild command:**
+```bash
+pkill server                 # Stop
+cmake --build build          # Rebuild
+./start.sh                   # Start
+```
+
+---
+
+## 🎬 Demo Day Preparation
+
+### Morning of Demo:
+```bash
+# 1. Start everything
+./start.sh
+
+# 2. Open browser
+# Go to: http://localhost:8081
+
+# 3. Add sample tasks (if starting fresh)
+# In new terminal:
+./add-sample-tasks.sh
+
+# 4. Refresh browser
+# Press Cmd+R
+
+# 5. Practice adding a task manually
+# Click "+ New Task" and fill the form
+```
+
+### During Demo:
+1. Show the dashboard with stats
+2. Click "+ New Task" and add a live task
+3. Switch to Calendar view
+4. Switch to Analytics view (show charts)
+5. Mark a task as complete (checkbox)
+6. Show different category filters
+
+---
+
+## 🐛 If Something Goes Wrong
+
+### "Failed to fetch" error:
+1. Check both servers are running:
+   - Terminal should show: "Crow/master server is running"
+   - Terminal should show: "Serving HTTP on"
+2. Make sure you're at http://localhost:8081 (NOT file://)
+3. Check browser console for specific error
+
+### Port already in use:
+```bash
+pkill server && lsof -ti:8081 | xargs kill -9
+./start.sh
+```
+
+### Tasks not appearing:
+1. Refresh browser (Cmd+R)
+2. Check: http://localhost:8080/api/tasks in browser
+   - Should show JSON array
+   - If empty, run `./add-sample-tasks.sh`
+
+### Server stopped running:
+- Don't run commands in the server terminal!
+- Use a separate terminal tab for commands
+- Keep server terminal open and running
+
+---
+
+## 📊 What Each File Does
+
+- **start.sh** - Your main script! Starts both servers
+- **add-sample-tasks.sh** - Adds demo data (optional, once only)
+- **data/tasks.json** - All your tasks saved here
+- **build/server** - The C++ backend program
+- **frontend/** - The website (HTML/CSS/JS)
+- **src/** - C++ source code
+
+---
+
+## 💡 Pro Tips
+
+1. **Keep server terminal visible** - You can see requests coming in
+2. **Use Cmd+R** to refresh browser after changes
+3. **Check browser console** - Right-click → Inspect → Console tab for errors
+4. **Tasks persist** - Stored in data/tasks.json, survive restarts
+5. **Clean slate** - Delete data/tasks.json to start fresh (backup first!)
+
+---
+
+## ✅ Current Status
+
+- ✅ Tasks.json cleared (no duplicates)
+- ✅ CORS fixed for browser requests
+- ✅ New start.sh that doesn't auto-add tasks
+- ✅ Sample data script with duplicate protection
+- ✅ All ready for your demo!
+
+**Next: Follow "Step 1" above to test everything!**

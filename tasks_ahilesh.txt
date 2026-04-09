@@ -1,0 +1,58 @@
+[
+  {
+    "category": "work",
+    "completed": true,
+    "completed_at": "2026-04-08 15:27:28",
+    "created_at": "2026-04-08 15:25:41",
+    "description": "",
+    "due_date": "2026-04-07",
+    "due_time": "17:25",
+    "id": "task_146963",
+    "notes": "",
+    "priority": 1,
+    "reminder_time": "",
+    "title": "Project documentation"
+  },
+  {
+    "category": "personal",
+    "completed": false,
+    "completed_at": "",
+    "created_at": "2026-04-08 15:26:04",
+    "description": "",
+    "due_date": "2026-04-09",
+    "due_time": "19:26",
+    "id": "task_849785",
+    "notes": "",
+    "priority": 1,
+    "reminder_time": "",
+    "title": "Dentist Appointment"
+  },
+  {
+    "category": "movies",
+    "completed": false,
+    "completed_at": "",
+    "created_at": "2026-04-08 15:26:36",
+    "description": "",
+    "due_date": "2026-04-15",
+    "due_time": "20:26",
+    "id": "task_423912",
+    "notes": "",
+    "priority": 3,
+    "reminder_time": "19:26",
+    "title": "Watch Dune: Part Two"
+  },
+  {
+    "category": "study",
+    "completed": false,
+    "completed_at": "",
+    "created_at": "2026-04-08 15:27:05",
+    "description": "",
+    "due_date": "2026-04-08",
+    "due_time": "20:30",
+    "id": "task_928999",
+    "notes": "",
+    "priority": 1,
+    "reminder_time": "",
+    "title": "Study for Algorithm Exam"
+  }
+]
